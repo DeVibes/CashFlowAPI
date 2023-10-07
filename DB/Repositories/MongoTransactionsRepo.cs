@@ -15,9 +15,10 @@ public class MongoTransactionsRepo : ITransactionsRepository
         _collection = mongoDatabase.GetCollection<TransactionDocument>("transactions");
     }
 
-    public Task<bool> CreateTransaction(CreateTransactionCommand command, CancellationToken cancellationToken = default)
+    public async Task<bool> CreateTransaction(CreateTransactionCommand command, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await _collection.InsertOneAsync(new TransactionDocument(command));
+        return true;
     }
 
     public async Task<bool> DeleteTransaction(DeleteTransactionCommand command, CancellationToken cancellationToken = default)
