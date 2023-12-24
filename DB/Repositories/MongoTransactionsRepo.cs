@@ -1,5 +1,5 @@
 using CashFlowAPI.DB.Entities;
-using CashFlowAPI.Features.Account;
+using CashFlowAPI.Features.Transactions;
 using CashFlowAPI.Features.Common.Interfaces;
 using MongoDB.Driver;
 

@@ -1,11 +1,12 @@
 using CashFlowAPI.Contracts.Requests;
 using CashFlowAPI.Features.Common.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
-namespace CashFlowAPI.Features.Account;
+namespace CashFlowAPI.Features.Transactions;
 
 public static class CreateTransaction
 {
-    public static async Task<IResult> HandleCreateTransactionEndpoint(CreateTransactionRequest request, CreateTransactionHandler handler, CancellationToken cancellationToken = default)
+    public static async Task<IResult> HandleCreateTransactionEndpoint([FromBody]CreateTransactionRequest request, CreateTransactionHandler handler, CancellationToken cancellationToken = default)
     {
         var command = new CreateTransactionCommand
         {

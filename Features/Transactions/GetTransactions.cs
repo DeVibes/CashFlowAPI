@@ -3,7 +3,7 @@ using CashFlowAPI.Contracts.Responses;
 using CashFlowAPI.Features.Common.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CashFlowAPI.Features.Account;
+namespace CashFlowAPI.Features.Transactions;
 
 public static class GetTransactions
 {

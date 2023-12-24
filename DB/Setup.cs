@@ -1,4 +1,7 @@
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace CashFlowAPI.DB;
@@ -13,6 +16,7 @@ public static class DBSetup
             configuration = serviceProvider.GetRequiredService<IConfiguration>();
         }
 
+        BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
         services.Configure<MongoConfig>(configuration.GetSection("MongoConfig"));
         services.AddSingleton<IMongoClient>(serviceProvider =>
         {

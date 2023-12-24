@@ -1,4 +1,4 @@
-using CashFlowAPI.Features.Account;
+using CashFlowAPI.Features.Transactions;
 
 namespace CashFlowAPI.DB.Entities;
 

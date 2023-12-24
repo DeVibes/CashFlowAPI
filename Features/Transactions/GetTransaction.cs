@@ -1,7 +1,7 @@
 using CashFlowAPI.Contracts.Responses;
 using CashFlowAPI.Features.Common.Interfaces;
 
-namespace CashFlowAPI.Features.Account;
+namespace CashFlowAPI.Features.Transactions;
 
 public static class GetTransaction
 {
