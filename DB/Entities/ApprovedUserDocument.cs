@@ -4,12 +4,12 @@ namespace CashFlowAPI.DB.Entities;
 
 public class ApprovedUserDocument
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; }
     public string Username { get; set; }
     public ApprovedUserDocument() {}
-    public ApprovedUserDocument(Guid id, string username)
+    public ApprovedUserDocument(string guid, string username)
     {
-        Id = id;
+        Id = guid;
         Username = username;
     }
 

@@ -1,12 +1,12 @@
-using CashFlowAPI.Features.Transactions;
+// using CashFlowAPI.Features.Transactions;
 
-namespace CashFlowAPI.Contracts.Responses;
+// namespace CashFlowAPI.Contracts.Responses;
 
-public record GetTransactionsResponse
-{
-    public GetTransactionsResponse(TransactionsReadModel readModel)
-    {
-        Payload = readModel.Transactions.Select(x => new GetTransactionResponse(x));
-    }
-    public IEnumerable<GetTransactionResponse> Payload { get; set; }
-}
+// public record GetTransactionsResponse
+// {
+//     public GetTransactionsResponse(TransactionsReadModel readModel)
+//     {
+//         Payload = readModel.Transactions.Select(x => new GetTransactionResponse(x));
+//     }
+//     public IEnumerable<GetTransactionResponse> Payload { get; set; }
+// }

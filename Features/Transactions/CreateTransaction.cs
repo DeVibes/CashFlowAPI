@@ -1,45 +1,44 @@
-using CashFlowAPI.Contracts.Requests;
-using CashFlowAPI.Features.Common.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+// using CashFlowAPI.Contracts.Requests;
+// using Microsoft.AspNetCore.Mvc;
 
-namespace CashFlowAPI.Features.Transactions;
+// namespace CashFlowAPI.Features.Transactions;
 
-public static class CreateTransaction
-{
-    public static async Task<IResult> HandleCreateTransactionEndpoint([FromBody]CreateTransactionRequest request, CreateTransactionHandler handler, CancellationToken cancellationToken = default)
-    {
-        var command = new CreateTransactionCommand
-        {
-            Price = request.Price,
-            Description = request.Description
-        };
+// public static class CreateTransaction
+// {
+//     public static async Task<IResult> HandleCreateTransactionEndpoint([FromBody]CreateTransactionRequest request, CreateTransactionHandler handler, CancellationToken cancellationToken = default)
+//     {
+//         var command = new CreateTransactionCommand
+//         {
+//             Price = request.Price,
+//             Description = request.Description
+//         };
         
-        await handler.Handle(command, cancellationToken);
+//         await handler.Handle(command, cancellationToken);
 
-        return Results.Ok();
-    }
-}
+//         return Results.Ok();
+//     }
+// }
 
-public record CreateTransactionCommand
-{
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public double Price { get; set; }
-    public string Description { get; set; }
-}
+// public record CreateTransactionCommand
+// {
+//     public Guid Id { get; set; } = Guid.NewGuid();
+//     public double Price { get; set; }
+//     public string Description { get; set; }
+// }
 
-public class CreateTransactionHandler : ICommandHandler<CreateTransactionCommand>
-{
-    private readonly ITransactionsRepository _transactionsRepository;
+// public class CreateTransactionHandler : ICommandHandler<CreateTransactionCommand>
+// {
+//     private readonly ITransactionsRepository _transactionsRepository;
 
-    public CreateTransactionHandler(ITransactionsRepository transactionsRepository)
-    {
-        _transactionsRepository = transactionsRepository;
-    }
+//     public CreateTransactionHandler(ITransactionsRepository transactionsRepository)
+//     {
+//         _transactionsRepository = transactionsRepository;
+//     }
 
-    public async Task Handle(CreateTransactionCommand command, CancellationToken cancellationToken = default)
-    {
-        // TODO Validate command
-        await _transactionsRepository.CreateTransaction(command, cancellationToken);
-        return;
-    }
-}
+//     public async Task Handle(CreateTransactionCommand command, CancellationToken cancellationToken = default)
+//     {
+//         // TODO Validate command
+//         await _transactionsRepository.CreateTransaction(command, cancellationToken);
+//         return;
+//     }
+// }

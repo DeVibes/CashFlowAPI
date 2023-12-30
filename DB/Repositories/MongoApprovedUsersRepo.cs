@@ -1,6 +1,6 @@
 using CashFlowAPI.DB.Entities;
 using CashFlowAPI.Features.ApprovedUsers;
-using CashFlowAPI.Features.Common.Interfaces;
+using CashFlowAPI.Common.Interfaces;
 using MongoDB.Driver;
 
 namespace CashFlowAPI.Repositories;
@@ -16,47 +16,54 @@ public class MongoApprovedUsersRepo : IApprovedUsersRepository
         _collection = mongoDatabase.GetCollection<ApprovedUserDocument>("approved-users");
     }
 
-    public async Task<bool> ApproveUser(string username, Guid id, CancellationToken cancellationToken = default)
+    public async Task<ApprovedUsersStatus> ApproveUser(string username, string guid, CancellationToken cancellationToken = default)
     {
-        await _collection.InsertOneAsync(new ApprovedUserDocument(id, username));
-        return true;
+        try
+        {
+            await _collection.InsertOneAsync(new ApprovedUserDocument(guid, username));
+            return ApprovedUsersStatus.Ok;
+        }
+        catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+        {
+            return ApprovedUsersStatus.AlreadyExist;
+        }
     }
 
-    public async Task<bool> DisapproveUserById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ApprovedUsersStatus> DisapproveUserById(string guid, CancellationToken cancellationToken = default)
     {
-        var idFilter = filterBuilder.Eq(x => x.Id, id);
+        var idFilter = filterBuilder.Eq(x => x.Id, guid);
         var dbResult = await _collection.DeleteOneAsync(idFilter);
-        return dbResult.DeletedCount > 1;
+        return dbResult.DeletedCount > 1 ? ApprovedUsersStatus.Ok : ApprovedUsersStatus.IDNotFound;
     }
 
-    public async Task<bool> DisapproveUserByUsername(string username, CancellationToken cancellationToken = default)
+    public async Task<ApprovedUsersStatus> DisapproveUserByUsername(string username, CancellationToken cancellationToken = default)
     {
         var usernameFilter = filterBuilder.Eq(x => x.Username, username);
         var dbResult = await _collection.DeleteOneAsync(usernameFilter );
-        return dbResult.DeletedCount > 1;
+        return dbResult.DeletedCount > 1 ? ApprovedUsersStatus.Ok : ApprovedUsersStatus.UsernameNotFound;
     }
 
-    public async Task<ApprovedUserReadModel> GetApprovedUserById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ApprovedUserReadModel?> GetApprovedUserById(string guid, CancellationToken cancellationToken = default)
     {
-        var idFilter = filterBuilder.Eq(x => x.Id, id);
+        var idFilter = filterBuilder.Eq(x => x.Id, guid);
         var dbResult = await _collection.Find(idFilter).SingleOrDefaultAsync(cancellationToken);
-        return dbResult.ToReadModel();
+        return dbResult?.ToReadModel();
     }
 
-    public async Task<ApprovedUserReadModel> GetApprovedUserByUsername(string username, CancellationToken cancellationToken = default)
+    public async Task<ApprovedUserReadModel?> GetApprovedUserByUsername(string username, CancellationToken cancellationToken = default)
     {
         var usernameFilter = filterBuilder.Eq(x => x.Username, username);
         var dbResult = await _collection.Find(username).SingleOrDefaultAsync(cancellationToken);
-        return dbResult.ToReadModel();
+        return dbResult?.ToReadModel();
     }
 
-    public async Task<ApprovedUsersReadModel> GetApprovedUsers(CancellationToken cancellationToken = default)
+    public async Task<ApprovedUsersReadModel?> GetApprovedUsers(CancellationToken cancellationToken = default)
     {
         var dbResult = await _collection
             .AsQueryable()
             .ToListAsync(cancellationToken);
 
-        var approvedUsers = dbResult.Select(doc => doc.ToReadModel());
+        var approvedUsers = dbResult?.Select(doc => doc.ToReadModel());
         return new ApprovedUsersReadModel(approvedUsers);
     }
 
