@@ -16,7 +16,7 @@ public class MongoApprovedUsersRepo : IApprovedUsersRepository
         _collection = mongoDatabase.GetCollection<ApprovedUserDocument>("approved-users");
     }
 
-    public async Task<ApprovedUsersStatus> ApproveUser(string username, string guid, CancellationToken cancellationToken = default)
+    public async Task<ApprovedUsersStatus> ApproveUser(string username, Guid guid, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -29,7 +29,7 @@ public class MongoApprovedUsersRepo : IApprovedUsersRepository
         }
     }
 
-    public async Task<ApprovedUsersStatus> DisapproveUserById(string guid, CancellationToken cancellationToken = default)
+    public async Task<ApprovedUsersStatus> DisapproveUserById(Guid guid, CancellationToken cancellationToken = default)
     {
         var idFilter = filterBuilder.Eq(x => x.Id, guid);
         var dbResult = await _collection.DeleteOneAsync(idFilter);
@@ -39,11 +39,11 @@ public class MongoApprovedUsersRepo : IApprovedUsersRepository
     public async Task<ApprovedUsersStatus> DisapproveUserByUsername(string username, CancellationToken cancellationToken = default)
     {
         var usernameFilter = filterBuilder.Eq(x => x.Username, username);
-        var dbResult = await _collection.DeleteOneAsync(usernameFilter );
+        var dbResult = await _collection.DeleteOneAsync(usernameFilter);
         return dbResult.DeletedCount > 1 ? ApprovedUsersStatus.Ok : ApprovedUsersStatus.UsernameNotFound;
     }
 
-    public async Task<ApprovedUserReadModel?> GetApprovedUserById(string guid, CancellationToken cancellationToken = default)
+    public async Task<ApprovedUserReadModel?> GetApprovedUserById(Guid guid, CancellationToken cancellationToken = default)
     {
         var idFilter = filterBuilder.Eq(x => x.Id, guid);
         var dbResult = await _collection.Find(idFilter).SingleOrDefaultAsync(cancellationToken);
@@ -53,7 +53,7 @@ public class MongoApprovedUsersRepo : IApprovedUsersRepository
     public async Task<ApprovedUserReadModel?> GetApprovedUserByUsername(string username, CancellationToken cancellationToken = default)
     {
         var usernameFilter = filterBuilder.Eq(x => x.Username, username);
-        var dbResult = await _collection.Find(username).SingleOrDefaultAsync(cancellationToken);
+        var dbResult = await _collection.Find(usernameFilter).SingleOrDefaultAsync(cancellationToken);
         return dbResult?.ToReadModel();
     }
 

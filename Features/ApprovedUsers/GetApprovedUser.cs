@@ -3,7 +3,7 @@ using CashFlowAPI.Common.Interfaces;
 
 namespace CashFlowAPI.Features.ApprovedUsers;
 public record GetApprovedUserQuery(string GuidOrUsername);
-public record ApprovedUserReadModel(string Id, string Username);
+public record ApprovedUserReadModel(Guid Id, string Username);
 public static class GetApprovedUserEndpoint
 {
     public static async Task<IResult> Handle(string guidOrUsername, GetApprovedUserQueryHandler handler, CancellationToken cancellationToken = default)
@@ -31,7 +31,7 @@ public class GetApprovedUserQueryHandler : IQueryHandler<GetApprovedUserQuery, A
     {
         var isGuid = Guid.TryParse(query.GuidOrUsername, out Guid guid);
         var approvedUser = isGuid ?
-            await _approvedUsersRepository.GetApprovedUserById(query.GuidOrUsername, cancellationToken) :
+            await _approvedUsersRepository.GetApprovedUserById(guid, cancellationToken) :
             await _approvedUsersRepository.GetApprovedUserByUsername(query.GuidOrUsername, cancellationToken);
 
         QueryResult<ApprovedUserReadModel> result = new()

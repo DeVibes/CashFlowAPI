@@ -32,7 +32,7 @@ public class DisapproveUserCommandHandler : ICommandHandler<DisapproveUserComman
     {
         var isGuid = Guid.TryParse(command.GuidOrUsername, out Guid guid);
         var disapproveStatus = isGuid ?
-            await _approvedUsersRepository.DisapproveUserById(command.GuidOrUsername, cancellationToken) :
+            await _approvedUsersRepository.DisapproveUserById(guid, cancellationToken) :
             await _approvedUsersRepository.DisapproveUserByUsername(command.GuidOrUsername, cancellationToken);
         CommandResult result = new()
         {

@@ -7,7 +7,7 @@ namespace CashFlowAPI.Features.ApprovedUsers;
 
 public record ApproveUserCommand
 {
-    public string Id { get; init; } = Guid.NewGuid().ToString();
+    public Guid Id { get; init; } = Guid.NewGuid();
     public string Username { get; init; } = string.Empty;
 }
 
