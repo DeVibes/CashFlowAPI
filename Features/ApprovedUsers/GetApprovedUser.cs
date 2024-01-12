@@ -1,5 +1,6 @@
-using CashFlowAPI.Common;
+using CashFlowAPI.Common.HandlerResults;
 using CashFlowAPI.Common.Interfaces;
+using CashFlowAPI.Contracts.Responses;
 
 namespace CashFlowAPI.Features.ApprovedUsers;
 public record GetApprovedUserQuery(string GuidOrUsername);
@@ -10,18 +11,18 @@ public static class GetApprovedUserEndpoint
     {
         GetApprovedUserQuery query = new(guidOrUsername);
         var result = await handler.Handle(query, cancellationToken);
-        return result.IsSuccess ? 
-            Results.Ok(result) :
-            Results.NotFound(result);
+
+        var isUserNotFound = result.ErrorType.Equals(ApprovedUsersStatus.NotFound.ToString());
+        if (isUserNotFound)
+            return Results.NotFound(new APIErrorResponse(result.ErrorType, result.Message));
+        return Results.Ok(new APIDataResposne(result.Message, result.Payload));
     }
 }
 
 public class GetApprovedUserQueryHandler : IQueryHandler<GetApprovedUserQuery, ApprovedUserReadModel>
 {
-    private string UsernameNotFoundStatus(string username) => 
-        $"Username - {username} was not found";
-    private string IDNotFoundStatus(string guid) => 
-        $"ID - {guid} was not found";
+    private string NotFoundStatus(string guidOrUsername) => 
+        $"{guidOrUsername} was not found";
     private readonly IApprovedUsersRepository _approvedUsersRepository;
     public GetApprovedUserQueryHandler(IApprovedUsersRepository approvedUsersRepository)
     {
@@ -37,14 +38,10 @@ public class GetApprovedUserQueryHandler : IQueryHandler<GetApprovedUserQuery, A
         QueryResult<ApprovedUserReadModel> result = new()
         {
             IsSuccess = approvedUser is not null,
-            Payload = approvedUser
+            Payload = approvedUser,
+            Message = approvedUser is null ? NotFoundStatus(query.GuidOrUsername) : string.Empty,
+            ErrorType = approvedUser is null ? ApprovedUsersStatus.NotFound.ToString() : ApprovedUsersStatus.Ok.ToString(),
         };
-        if (approvedUser is not null)
-            return result;
-        if (isGuid)
-            result.Status = IDNotFoundStatus(query.GuidOrUsername);
-        else 
-            result.Status = UsernameNotFoundStatus(query.GuidOrUsername);
         return result;
     }
 }

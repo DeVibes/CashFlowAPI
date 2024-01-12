@@ -1,4 +1,4 @@
-namespace CashFlowAPI.Common;
+namespace CashFlowAPI.Common.HandlerResults;
 
 public record QueryResult<T> : HandlerResult
 {

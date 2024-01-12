@@ -1,3 +1,5 @@
+using CashFlowAPI.Common.HandlerResults;
+
 namespace CashFlowAPI.Common.Interfaces;
 
 public interface IQueryHandler<TQuery, TResult>

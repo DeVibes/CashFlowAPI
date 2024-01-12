@@ -1,6 +1,7 @@
-using CashFlowAPI.Common;
+using CashFlowAPI.Common.HandlerResults;
 using CashFlowAPI.Common.Interfaces;
 using CashFlowAPI.Contracts.Requests;
+using CashFlowAPI.Contracts.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlowAPI.Features.ApprovedUsers;
@@ -20,14 +21,15 @@ public static class ApproveUserEndpoint
             Username = request.Username
         };
 
-        var result = await handler.Handle(command, cancellationToken); 
-        return result.IsSuccess ? 
-            Results.CreatedAtRoute
-            (
-                routeName: nameof(GetApprovedUserEndpoint),
-                routeValues: new { guidOrUsername = request.Username },
-                value: request.Username
-            ) : Results.BadRequest(result.Status);
+        var result = await handler.Handle(command, cancellationToken);
+        var isUserAlreadyExists = result.ErrorType.Equals(ApprovedUsersStatus.AlreadyExist.ToString());
+        if (isUserAlreadyExists)
+            return Results.BadRequest(new APIErrorResponse(result.ErrorType, result.Message));
+        return Results.CreatedAtRoute(
+            nameof(GetApprovedUserEndpoint),
+            new { guidOrUsername = request.Username },
+            result.Message
+            );
     }
 }
 
@@ -48,13 +50,15 @@ public class ApproveUserCommandHandler : ICommandHandler<ApproveUserCommand>
         CommandResult result = new()
         {
             IsSuccess = approveStatus is ApprovedUsersStatus.Ok,
-            Status = approveStatus switch
+            Message = approveStatus switch
             {
                 ApprovedUsersStatus.Ok => SuccessStatus(command.Username),
                 ApprovedUsersStatus.AlreadyExist => AlreadyExistStatus(command.Username),
                 _ => string.Empty
             }
         };
+        if (approveStatus is ApprovedUsersStatus.AlreadyExist)
+            result.ErrorType = ApprovedUsersStatus.AlreadyExist.ToString();
         return result;
     }
 }

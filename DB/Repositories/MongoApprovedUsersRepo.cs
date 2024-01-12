@@ -33,14 +33,14 @@ public class MongoApprovedUsersRepo : IApprovedUsersRepository
     {
         var idFilter = filterBuilder.Eq(x => x.Id, guid);
         var dbResult = await _collection.DeleteOneAsync(idFilter);
-        return dbResult.DeletedCount > 1 ? ApprovedUsersStatus.Ok : ApprovedUsersStatus.IDNotFound;
+        return dbResult.DeletedCount > 0 ? ApprovedUsersStatus.Ok : ApprovedUsersStatus.NotFound;
     }
 
     public async Task<ApprovedUsersStatus> DisapproveUserByUsername(string username, CancellationToken cancellationToken = default)
     {
         var usernameFilter = filterBuilder.Eq(x => x.Username, username);
         var dbResult = await _collection.DeleteOneAsync(usernameFilter);
-        return dbResult.DeletedCount > 1 ? ApprovedUsersStatus.Ok : ApprovedUsersStatus.UsernameNotFound;
+        return dbResult.DeletedCount > 0 ? ApprovedUsersStatus.Ok : ApprovedUsersStatus.NotFound;
     }
 
     public async Task<ApprovedUserReadModel?> GetApprovedUserById(Guid guid, CancellationToken cancellationToken = default)

@@ -1,5 +1,6 @@
-using CashFlowAPI.Common;
+using CashFlowAPI.Common.HandlerResults;
 using CashFlowAPI.Common.Interfaces;
+using CashFlowAPI.Contracts.Responses;
 
 namespace CashFlowAPI.Features.ApprovedUsers;
 
@@ -10,17 +11,18 @@ public static class DisapproveUserEndpoint
     {
         DisapproveUserCommand command = new(guidOrUsername);
         var result = await handler.Handle(command);
-        return result.IsSuccess ? 
-            Results.Ok(result.Status) :
-            Results.NotFound(result.Status);
+
+        var isUserNotFound = result.ErrorType.Equals(ApprovedUsersStatus.NotFound.ToString());
+        if (isUserNotFound)
+            return Results.NotFound(new APIErrorResponse(result.ErrorType, result.Message));
+        return Results.Ok(new APIOkResposne(result.Message));
     }
 }
 
 public class DisapproveUserCommandHandler : ICommandHandler<DisapproveUserCommand>
 {
-    private string DisapprovedSuccessfullyStatus(string username) => $"Username {username} disapproved ";
-    private string IDNotFoundStatus(string guid) => $"Did not find id - {guid}";
-    private string UsernameNotFoundStatus(string username) => $"Did not find username - {username}";
+    private string DisapprovedSuccessfullyStatus(string guidOrUsername) => $"{guidOrUsername} disapproved";
+    private string NotFoundStatus(string guidOrUsername) => $"Did not find id - {guidOrUsername}";
     private readonly IApprovedUsersRepository _approvedUsersRepository;
 
     public DisapproveUserCommandHandler(IApprovedUsersRepository approvedUsersRepository)
@@ -37,11 +39,15 @@ public class DisapproveUserCommandHandler : ICommandHandler<DisapproveUserComman
         CommandResult result = new()
         {
             IsSuccess = disapproveStatus is ApprovedUsersStatus.Ok,
-            Status = disapproveStatus switch
+            Message = disapproveStatus switch
             {
                 ApprovedUsersStatus.Ok => DisapprovedSuccessfullyStatus(command.GuidOrUsername),
-                ApprovedUsersStatus.IDNotFound => IDNotFoundStatus(command.GuidOrUsername),
-                ApprovedUsersStatus.UsernameNotFound => UsernameNotFoundStatus(command.GuidOrUsername),
+                ApprovedUsersStatus.NotFound => NotFoundStatus(command.GuidOrUsername),
+                _ => string.Empty
+            },
+            ErrorType = disapproveStatus switch
+            {
+                ApprovedUsersStatus.NotFound => ApprovedUsersStatus.NotFound.ToString(),
                 _ => string.Empty
             }
         };

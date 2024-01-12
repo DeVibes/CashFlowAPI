@@ -1,5 +1,6 @@
-using CashFlowAPI.Common;
+using CashFlowAPI.Common.HandlerResults;
 using CashFlowAPI.Common.Interfaces;
+using CashFlowAPI.Contracts.Responses;
 
 namespace CashFlowAPI.Features.ApprovedUsers;
 
@@ -11,8 +12,8 @@ public static class GetApprovedUsersEndpoint
     public static async Task<IResult> Handle(GetApprovedUsersQueryHandler handler, CancellationToken cancellationToken = default)
     {
         GetApprovedUsersQuery query = new();
-        var response = await handler.Handle(query, cancellationToken);
-        return Results.Ok(response);
+        var result = await handler.Handle(query, cancellationToken);
+        return Results.Ok(new APIDataResposne(result.Message, result.Payload));
     }
 }
 
