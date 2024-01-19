@@ -21,6 +21,7 @@ public static class Setup
             .MapGet(ApiRoutes.ApprovedUsers.GetApprovedUsers, GetApprovedUsersEndpoint.Handle);
         application
             .MapGet(ApiRoutes.ApprovedUsers.GetApprovedUser, GetApprovedUserEndpoint.Handle)
+            .RequireAuthorization("read:approved")
             .WithName(nameof(GetApprovedUserEndpoint));
         application.MapPost(ApiRoutes.ApprovedUsers.ApproveUser, ApproveUserEndpoint.Handle);
         application.MapDelete(ApiRoutes.ApprovedUsers.DisapproveUser, DisapproveUserEndpoint.Handle);

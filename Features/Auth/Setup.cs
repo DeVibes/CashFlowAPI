@@ -8,7 +8,7 @@ namespace CashFlowAPI.Features.Auth;
 public static class Setup
 {
     private const string CLAIM_TYPE = "permissions";
-    private static List<string> Permissions = new List<string> {"admin", "user"};
+    private static List<string> Permissions = new List<string> {"read:approved", "user"};
     public static IServiceCollection AddAuthServices(this IServiceCollection services, string domain, string audience)
     {
         services
@@ -16,6 +16,7 @@ public static class Setup
             .AddJwtBearer(options => 
             {
                 options.Authority = domain;
+                options.Audience = audience;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = ClaimTypes.NameIdentifier,
